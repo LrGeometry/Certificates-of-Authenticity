@@ -1,0 +1,16 @@
+{
+  "name": "COO",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "openzeppelin-solidity": "2.1.2",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.1",
+    "web3": "^1.0.0-beta.36"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
