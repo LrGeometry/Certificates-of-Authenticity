@@ -4,7 +4,7 @@ const Web3 = require('web3');
 
 const ropstenUrl = `https://eth-ropsten.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
 const rinkebyUrl = `https://eth-rinkeby.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
-
+const mainNetUrl=`https://eth-mainnet.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
 module.exports = {
   networks: {
     development: {
@@ -30,6 +30,14 @@ module.exports = {
       gasPrice: 2000000000,
       gas: 4712388,
     },
+    mainnet: {
+      provider() {
+        return new HDWalletProvider(process.env.KEY, mainNetUrl, 0);
+      },
+      network_id: 1,
+      gasPrice: 2000000000,
+      gas: 6000000,
+    }
   },
   mocha: {
     useColors: true,

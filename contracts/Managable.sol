@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol';
+import './openzeppelin/ERC721Full.sol';
 
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Mintable.sol';
+import './openzeppelin/ERC721Mintable.sol';
 
 contract Managable is ERC721Full, ERC721Mintable{
 
@@ -25,7 +25,7 @@ mapping(address=>mapping(uint=>bool)) public Manager;
     require(Client[msg.sender][order]==true);
     _;
   }
-   modifier isManger(uint order){
+   modifier isManager(uint order){
     require(Manager[msg.sender][order]==true);
     _;
   }
@@ -41,9 +41,10 @@ mapping(address=>mapping(uint=>bool)) public Manager;
     }  
 
   function AssignAsManager(uint order,address manager) public isTokenOwner(order){
-       require(Manager[manager][order]==false)   ;
+    require(Manager[manager][order]==false);
     Manager[manager][order]=true;
     } 
+    
   function delistManager(uint order,address manager) public isTokenOwner(order){
     require(Manager[manager][order]==true);
     Manager[manager][order]=false;

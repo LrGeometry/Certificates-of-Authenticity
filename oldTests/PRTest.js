@@ -54,7 +54,7 @@ await PRToken.mint(to,stockNumber,descriptions,qty,unitprices, extendedprice,Pur
 await PRToken.mint(to,stockNumber,descriptions,qty,unitprices, extendedprice,PurchaseRequestStringParams2,PurchaseRequestIntParams2)
 })
 it('purchase request has correct data', async function(){  
-let Req=await PRToken.getPurchaseRequestInfo(1)
+let Req=await PRToken.getPurchaseRequestInfo(1,{from:to})
 
 
 //console.log(Req)
@@ -71,23 +71,25 @@ assert.equal(Req.DateNeeded,PurchaseRequestIntParams[2],'correct date needed')
 assert.equal(Req.shipVia,PurchaseRequestStringParams[6],'correct ship via')
 })
 it('Items have correct metadata', async function(){  
-let Item=await PRToken.getTotalItems(1)
-let Item1=Items[1]
-let Item=Items[0]
-assert.equal(Item[0],stockNumber[0],'correct stock number')
-assert.equal(Item[1],descriptions[0],'correct description')
-assert.equal(Item[2].toNumber(),qty[0],'correct stock number')
-assert.equal(Item[3].toNumber(),unitprices[0],'correct stock number')
-assert.equal(Item[4].toNumber(),extendedprice[0],'correct stock number')
-let Item1=await PRToken.Items(1,1)
-assert.equal(Item1[0].toNumber(),stockNumber[1],'correct stock number')
-assert.equal(Item1[1],descriptions[1],'correct description')
-assert.equal(Item1[2].toNumber(),qty[1],'correct stock number')
-assert.equal(Item1[3].toNumber(),unitprices[1],'correct stock number')
-assert.equal(Item1[4].toNumber(),extendedprice[1],'correct stock number')
+let Item=await PRToken.getTotalItems(1,{from:to})
+let Item1=Item[0]
+console.log(Item1)
+let Item2=Item[1]
+console.log(Item2)
+assert.equal(Item1[0],stockNumber[0],'correct stock number')
+assert.equal(Item1[1],descriptions[0],'correct description')
+assert.equal(Item1[2],qty[0],'correct stock number')
+assert.equal(Item1[3],unitprices[0],'correct stock number')
+assert.equal(Item1[4],extendedprice[0],'correct stock number')
+
+assert.equal(Item2[0],stockNumber[1],'correct stock number')
+assert.equal(Item2[1],descriptions[1],'correct description')
+assert.equal(Item2[2],qty[1],'correct stock number')
+assert.equal(Item2[3],unitprices[1],'correct stock number')
+assert.equal(Item2[4],extendedprice[1],'correct stock number')
 })
 it('second purchase request has correct data', async function(){  
-let Req=await PRToken.getPurchaseRequestInfo(2)
+let Req=await PRToken.getPurchaseRequestInfo(2,{from:to})
 assert.equal(Req.Date,PurchaseRequestIntParams2[0],'correct date')
 assert.equal(Req.Department,PurchaseRequestStringParams2[1],'corect department')
 assert.equal(Req.ChargeTo,PurchaseRequestStringParams2[2],'correct ChargeTo')
@@ -99,20 +101,20 @@ assert.equal(Req.DateNeeded,PurchaseRequestIntParams2[2],'correct date needed')
 assert.equal(Req.shipVia,PurchaseRequestStringParams2[6],'correct ship via')
 })
 it('Items have correct metadata', async function(){  
-    let Items=await PRToken.getTotalItems(1)
-    let Item1=Items[1]
-    let Item=Items[0]
-    assert.equal(Item[0].toNumber(),stockNumber[0],'correct stock number')
-    assert.equal(Item[1],descriptions[0],'correct description')
-    assert.equal(Item[2].toNumber(),qty[0],'correct stock number')
-    assert.equal(Item[3].toNumber(),unitprices[0],'correct stock number')
-    assert.equal(Item[4].toNumber(),extendedprice[0],'correct stock number')
+    let Items=await PRToken.getTotalItems(1,{from:to})
+    let Item2=Items[1]
+    let Item1=Items[0]
+    assert.equal(Item1[0],stockNumber[0],'correct stock number')
+    assert.equal(Item1[1],descriptions[0],'correct description')
+    assert.equal(Item1[2],qty[0],'correct stock number')
+    assert.equal(Item1[3],unitprices[0],'correct stock number')
+    assert.equal(Item1[4],extendedprice[0],'correct stock number')
     
-    assert.equal(Item1[0].toNumber(),stockNumber[1],'correct stock number')
-    assert.equal(Item1[1],descriptions[1],'correct description')
-    assert.equal(Item1[2].toNumber(),qty[1],'correct stock number')
-    assert.equal(Item1[3].toNumber(),unitprices[1],'correct stock number')
-    assert.equal(Item1[4].toNumber(),extendedprice[1],'correct stock number')
+    assert.equal(Item2[0],stockNumber[1],'correct stock number')
+    assert.equal(Item2[1],descriptions[1],'correct description')
+    assert.equal(Item2[2],qty[1],'correct stock number')
+    assert.equal(Item2[3],unitprices[1],'correct stock number')
+    assert.equal(Item2[4],extendedprice[1],'correct stock number')
     })
 
 });

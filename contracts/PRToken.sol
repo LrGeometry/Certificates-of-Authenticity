@@ -48,7 +48,7 @@ struct Item{
 
   mapping(uint=>Item[]) private Items;
 
-  constructor() Managable( "PR","PurchaseRequest") public {
+  constructor() Managable( "PurchaseRequest","PR") public {
   }
 
   function mint(address to,uint[] memory stockNumbers, string[] memory ItemDescriptions, uint[] memory  itemQTYS,uint[] memory itemUnitPrices,

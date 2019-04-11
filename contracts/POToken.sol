@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
 import './Managable.sol';
-
+import './RFQToken.sol';
 contract POToken is Managable {
 
   struct Item{
@@ -29,14 +29,20 @@ contract POToken is Managable {
   mapping(uint=>Item[]) private Items;
 
   uint createdTokens=0;
-
-  constructor() Managable( "PO","PurchaseOrder") public {
-    
+  RFQToken RFQ;
+  constructor(address a) Managable( "PurchaseOrder","PO") public {
+    RFQ=RFQToken(a);
   }
 
   function MintPO(address to, string[] memory _names,bytes32[] memory _codes,uint[] memory _QTY,uint[] memory _price,uint[] memory 
-    _discount,uint[] memory _total,uint  _DeliveryDate,string[] memory PurchaseOrderParams ) onlyMinter() public  returns (bool) {
-        
+    _discount,uint[] memory _total,uint  _DeliveryDate,string[] memory PurchaseOrderParams,uint _RFQ ) onlyMinter() public  returns (bool) {
+  require(RFQ.ownerOf(_RFQ)==msg.sender);
+
+  if (RFQ.getCancelationPolicy(_RFQ))
+    if(now>RFQ.getTimeStamp(_RFQ)+20*86400)
+      revert();
+    
+
         _mint(to, createdTokens+1);
        
         completionStatus[createdTokens+1]=false;
@@ -49,6 +55,7 @@ contract POToken is Managable {
          createdTokens+=1;
         return true;
     }
+
     function getOrderInfo(uint order) public view returns(PurchaseOrder memory){
 
      return(PurchaseOrders[order]);
@@ -57,6 +64,7 @@ contract POToken is Managable {
     function getTotalItems(uint order) public view returns(Item[] memory){
       return Items[order];
     }
+
     function alterNote(uint order,string memory s) public{
       require(ownerOf(order)==msg.sender);
       PurchaseOrder storage PO=PurchaseOrders[order];
