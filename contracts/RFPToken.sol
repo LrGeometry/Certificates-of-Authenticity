@@ -12,12 +12,12 @@ Company Name, Logo, Point of Contact, 0xaddress, Time Stamp, GeoLocation, & Free
     string CompanyName; 
     string AddressParcel;
     string Requirement;
-    uint Deadline; 
+    string EquivalentSubstitution;
     string AcceptanceCriteria;
-    uint ModeofTransport;
     string ContactEmail;
     uint  Budget;
-    string EquivalentSubstitution;
+    uint Deadline;
+    uint ModeofTransport;    
   }
   mapping(uint=> RequestForProposal) private  RequestsForProposal;
 
@@ -28,7 +28,7 @@ Company Name, Logo, Point of Contact, 0xaddress, Time Stamp, GeoLocation, & Free
     _;
   }
 
-  constructor() Managable(" RequestForProposal" , "RFP") public {
+  constructor() Managable("RequestForProposal","RFP") public {
     
   }
 

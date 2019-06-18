@@ -35,13 +35,13 @@ contract POToken is Managable {
   }
 
   function MintPO(address to, string[] memory _names,bytes32[] memory _codes,uint[] memory _QTY,uint[] memory _price,uint[] memory 
-    _discount,uint[] memory _total,uint  _DeliveryDate,string[] memory PurchaseOrderParams,uint _RFQ ) onlyMinter() public  returns (bool) {
+    _discount,uint[] memory _total,uint  _DeliveryDate,string[] memory PurchaseOrderParams,uint _RFQ )  public  returns (bool) {
   require(RFQ.ownerOf(_RFQ)==msg.sender);
 
-  if (RFQ.getCancelationPolicy(_RFQ))
+  if (RFQ.getCancelationPolicy(_RFQ)==true){
     if(now>RFQ.getTimeStamp(_RFQ)+20*86400)
       revert();
-    
+   }  
 
         _mint(to, createdTokens+1);
        

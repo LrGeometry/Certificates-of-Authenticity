@@ -30,20 +30,15 @@ contract TOS is ERC721Full, Ownable {
     uint256 public constant CONTRACT_UPDATE_PRICE = 0 * 10 ** 18;
 
     struct provenance {
-        uint256 hercid;
-        uint256 provenanceId;
-        uint256 barId;
-        uint256 serialnumber;
-
-        uint256 price;
-        uint256 timestamp;
-        uint256 weight;
-        string  assay;
-        string ipfshash;
-        string  manufacturer;
-        string factomEntryHash;
        
-        string data;
+        uint256 BarId;
+        string  Manufacturer;
+        uint GrossWeight;         
+        string  Assay;
+        uint256 Serialnumber;
+        string Supplier;
+        string Vault;
+        uint CertifierID;
     }
     mapping(uint=>provenance) provenances;
     //provenance[] internal provenances;
@@ -111,40 +106,21 @@ contract TOS is ERC721Full, Ownable {
             token.transferFrom(provenanceOwner, address(this), CONTRACT_CREATION_PRICE),
             "Transfer failed"
         );
-/** uint256 hercid;
-        uint256 provenanceId;
-        uint256 barId;
-        uint256 serialnumber;
-
-        uint256 price;
-        uint256 timestamp;
-        uint256 weight
-        string assay;
-        string ipfshash;
-        string  manufacturer;
-        string factomEntryHash;
-       
-        string data; */
-        provenance memory p=provenance({
-                hercid: newprovenance.hercid,
-                provenanceId:newprovenance.provenanceId,
-                barId: newprovenance.barId,
-                serialnumber: newprovenance.serialnumber,
-                price: newprovenance.price,                         
-                timestamp:now,
-                weight:newprovenance.weight,
-
-                assay:newprovenance.assay,
-                ipfshash:newprovenance.ipfshash,
-                manufacturer:newprovenance.manufacturer,
-                factomEntryHash: newprovenance.factomEntryHash,               
-                data: newprovenance.data
-            });
-        provenances[newprovenance.provenanceId]=p;
+/**    uint256 BarId;
+        string  Manufacturer;
+        uint GrossWeight;         
+        string  Assay;
+        uint256 Serialnumber;
+        string Supplier;
+        string Vault
+        uint CertifierID;
+         */
+        
+        provenances[newprovenance.BarId]=newprovenance;
        
 
-        _mint(provenanceOwner, newprovenance.provenanceId);
-        _setTokenURI(newprovenance.provenanceId, uri);
+        _mint(provenanceOwner, newprovenance.BarId);
+        _setTokenURI(newprovenance.BarId, uri);
     }
 
     /**
