@@ -10,14 +10,14 @@ import "./ERC1155.sol";
 contract ERC1155Mintable is ERC1155 {
 
     bytes4 constant private INTERFACE_SIGNATURE_URI = 0x0e89341c;
-    mapping(uint256=>string) public Symbol;
-    mapping(uint256=>string) public Name;
+    
     // id => creators
     mapping (uint256 => address) public creators;
     
     // A nonce to ensure we have a unique id each time we mint.
     uint256 public nonce;
-   
+    //mapping(uint256=>uint256) mintingLimit;
+    mapping(uint256=>uint256) MintableTokens;
     modifier creatorOnly(uint256 _id) {
         require(creators[_id] == msg.sender);
         _;
@@ -39,7 +39,9 @@ contract ERC1155Mintable is ERC1155 {
    
     // Batch mint tokens. Assign directly to _to[].
     function mint(uint256 _id, address[] memory _to, uint256[] memory _quantities) public creatorOnly(_id) {
-
+        uint total=sumAsm(_quantities);
+        require(total<=MintableTokens[_id]);
+        MintableTokens[_id]=MintableTokens[_id].sub(total);
         for (uint256 i = 0; i < _to.length; ++i) {
 
             address to = _to[i];
@@ -58,8 +60,13 @@ contract ERC1155Mintable is ERC1155 {
             }
         }
     }
+      function sumAsm(uint[] memory _data) public pure returns (uint sum) {
+        for (uint i = 0; i < _data.length; ++i) {
+            assembly {
+                sum := add(sum, mload(add(add(_data, 0x20), mul(i, 0x20))))
+            }
+        }
 
-    function setURI(string memory _uri, uint256 _id) public creatorOnly(_id) {
-        emit URI(_uri, _id);
-    }
-}
+
+        
+    }}

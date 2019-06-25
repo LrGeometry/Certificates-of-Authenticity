@@ -1,6 +1,6 @@
 const Token = artifacts.require('HERC1155');
 const Receiver= artifacts.require('./ERC/ERC1155MockReceiver')
-const expectThrow = require('./helpers/expectThrow');
+const expectThrow = require('../test/helpers/expectThrow');
 
 
 const BigNumber = require('bignumber.js');
@@ -154,7 +154,7 @@ async function testSafeBatchTransferFrom(operator, from, to, ids, quantities, da
 
 contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
     before(async () => {
-        user1 = accounts[1];
+        user1 = accounts[0];
         user2 = accounts[2];
         user3 = accounts[3];
         user4 = accounts[4];

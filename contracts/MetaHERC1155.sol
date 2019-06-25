@@ -33,14 +33,14 @@ contract MetaHERC1155 is HERC1155{
 
    function metaApprove(bytes memory signature,address _spender, uint256 _id, uint256 _currentValue, uint256 _value,uint _nonce)
     public{
-        bytes32 hash = metaApproveHash(_spender, _id,_currentvalue, _value,_nonce);
+        bytes32 hash = metaApproveHash(_spender, _id,_currentValue, _value,_nonce);
         address signer = getSigner(hash, signature);
 
         require(signer != address(0), "Cannot get signer");
         require(nonce == nonces[signer], "Nonce is invalid");
 
         nonces[signer] += 1;
-        approve(signer,  _to,  _ids,   _values,_data);
+        //approve(signer,  _spender,  _ids,   _valuea,_data);
    }
    
 
@@ -51,7 +51,7 @@ contract MetaHERC1155 is HERC1155{
         return keccak256(abi.encodePacked(address(this), "metaBatchTransferFrom", to, tokenIds,values, _nonce));
     }
     function metaApproveHash(address _spender, uint256 _id, uint256 _currentValue, uint256 _value,uint _nonce) public view returns (bytes32) {
-        return keccak256(abi.encodePacked(address(this), "metaApproveHash"),_spender,_currentValue,_value,nonce);
+        return keccak256(abi.encodePacked(address(this), "metaApproveHash",_spender,_currentValue,_value,nonce));
     }
     /*
      * @dev Gets the signer of an hash using the signature

@@ -10,7 +10,7 @@ contract("testing enumeration and approval",(accounts)=>{
 
 
     before(async () => {
-        user1 = accounts[1];
+        user1 = accounts[0];
         user2 = accounts[2];
         user3 = accounts[3];
         user4 = accounts[4];
@@ -22,6 +22,7 @@ contract("testing enumeration and approval",(accounts)=>{
     it('Create initial items and adds them to list', async () => {
     let hammerQuantity = 5;
     let hammerUri = 'https://metadata.enjincoin.io/hammer.json';
+    let mutabledata="something"
     tx = await mainContract.create(hammerQuantity, hammerUri,"hammer","hm", {from: user1});
     
     
@@ -30,6 +31,7 @@ contract("testing enumeration and approval",(accounts)=>{
 
     let swordQuantity = 200;
     let swordUri = 'https://metadata.enjincoin.io/sword.json';
+    let mutabledata="other thing"
     tx = await mainContract.create(swordQuantity, swordUri,"sword","sd", {from: user1});
    
    
@@ -47,6 +49,7 @@ contract("testing enumeration and approval",(accounts)=>{
         //safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data)
         //safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data)
         await  mainContract.safeTransferFrom(user1,user2,1,5,"0x00001",{from:user1})
+        await  mainContract.safeTransferFrom(user1,user2,1,0,"0x00001",{from:user1})
         console.log(await  mainContract.getAllOwnedTokens(user1))
         console.log(await  mainContract.getAllOwnedTokens(user2))
     })
@@ -61,6 +64,7 @@ contract("testing enumeration and approval",(accounts)=>{
         //safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data)
         //safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data)
         await  mainContract.safeBatchTransferFrom(user1,user2,[2,3],[100,500],"0x00001",{from:user1})
+        await  mainContract.safeBatchTransferFrom(user1,user2,[2,3],[0,0],"0x00001",{from:user1})
         console.log(await  mainContract.getAllOwnedTokens(user1))
         console.log(await  mainContract.getAllOwnedTokens(user2))
     })

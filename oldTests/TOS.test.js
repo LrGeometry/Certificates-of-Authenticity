@@ -43,6 +43,7 @@ const testprovenance = {
   
   data: 'randomDataHash',
 };
+[0,1,2,200,234234112,300,'assay placeholder','0xsdfaweifhifehalfhkwehfilawhfuihweakuhwh','gucci','FactomEntryHash']
 console.log(testprovenance)
 let updatedprovenance={
   

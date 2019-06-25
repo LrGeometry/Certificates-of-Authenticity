@@ -18,10 +18,22 @@ contract ERC1155 is IERC1155, ERC165
     
     // id => (owner => balance)
     mapping (uint256 => mapping(address => uint256)) internal balances;
-     mapping(address => mapping(address => mapping(uint256 => uint256))) allowances;
+    mapping(address => mapping(address => mapping(uint256 => uint256))) allowances;
     // owner => (operator => approved)
     mapping (address => mapping(address => bool)) internal operatorApproval;
+    mapping(uint=>string) internal MutableTokenData;
+    mapping(uint=>string) internal TokenData;
+    mapping(uint256=>string) public Symbol;
+    mapping(uint256=>string) public Name;
+    mapping(uint256=>bool) internal isNFT;
+    event Approval(address indexed _owner, address indexed _spender, uint256 indexed _id, uint256 _oldValue, uint256 _value);
+   
 
+     // Mapping from owner to list of owned token IDs
+    mapping(address => uint256[]) private _ownedTokens;
+
+    // Mapping from token ID to index of the owner tokens list
+    mapping(address=>mapping(uint256 => uint256)) private _ownedTokensIndex;
 /////////////////////////////////////////// ERC165 //////////////////////////////////////////////
 
     /*
@@ -54,7 +66,7 @@ contract ERC1155 is IERC1155, ERC165
    
 
      function _safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) internal {
-
+        require(_value>0,"cannot tranfer 0 toknes");
         require(_to != address(0x0), "_to must be non-zero.");
        // require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Need operator approval for 3rd party transfers.");
 
@@ -122,5 +134,188 @@ contract ERC1155 is IERC1155, ERC165
     */
     function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
         return operatorApproval[_owner][_operator];
+    }
+
+    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) public  {
+            if (msg.sender != _from) {
+                if(operatorApproval[_from][msg.sender] == false){
+                    require( allowances[_from][msg.sender][_id]>= _value,"inadequate allowance");
+                    allowances[_from][msg.sender][_id] = allowances[_from][msg.sender][_id].sub(_value);
+                }
+            }
+            
+            
+
+             if(balanceOf(_from,_id).sub(_value)==0){
+                _removeTokenFromOwnerEnumeration( _from, _id);
+              }
+            if(balanceOf(_to,_id)==0){
+                 _addTokenToOwnerEnumeration(_to, _id); 
+              }
+            _safeTransferFrom(_from, _to, _id, _value, _data);
+        }
+
+  
+    function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) public /*payable*/ {
+       
+        if (msg.sender != _from) {
+            if(operatorApproval[_from][msg.sender] == false){
+                for (uint256 i = 0; i < _ids.length; ++i) {
+                    require( allowances[_from][msg.sender][_ids[i]]>=_values[i],"inadequate allowance");
+                    allowances[_from][msg.sender][_ids[i]] = allowances[_from][msg.sender][_ids[i]].sub(_values[i]);
+                    
+                }
+            }
+        }
+        _safeBatchTransferFrom(_from, _to, _ids, _values, _data);
+    }
+     /**
+        @notice Send multiple types of Tokens from a 3rd party in one transfer (with safety call).
+        @dev MUST emit TransferBatch event on success.
+        Caller must be approved to manage the _from account's tokens (see isApprovedForAll).
+        MUST Throw if `_to` is the zero address.
+        MUST Throw if any of the `_ids` is not a valid token ID.
+        MUST Throw on any other error.
+        When transfer is complete, this function MUST check if `_to` is a smart contract (code size > 0). If so, it MUST call `onERC1155BatchReceived` on `_to` and revert if the return value is not `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`.
+        @param _from    Source address
+        @param _to      Target address
+        @param _ids     IDs of each token type
+        @param _values  Transfer amounts per token type
+        @param _data    Additional data with no specified format, sent in call to `_to`
+    */
+
+     
+    function _safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) internal {
+
+        // MUST Throw on errors
+        require(_to != address(0x0), "destination address must be non-zero.");
+        require(_ids.length == _values.length, "_ids and _values array lenght must match.");
+       // require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Need operator approval for 3rd party transfers.");
+
+        for (uint256 i = 0; i < _ids.length; ++i) {
+            uint256 id = _ids[i];
+            uint256 value = _values[i];
+            require(value > 0*10**18,"cannot transfer 0 tokens");
+            // SafeMath will throw with insuficient funds _from
+            // or if _id is not valid (balance will be 0)
+
+             if(balances[id][_from].sub(value)==0){
+                 _removeTokenFromOwnerEnumeration( _from,_ids[i]);
+                 }
+             if(balances[id][_to] ==0){
+                   _addTokenToOwnerEnumeration(_to,_ids[i]); 
+                }
+            balances[id][_from] = balances[id][_from].sub(value);
+            balances[id][_to]   = value.add(balances[id][_to]);
+        }
+
+        // MUST emit event
+        emit TransferBatch(msg.sender, _from, _to, _ids, _values);
+
+        // Now that the balances are updated,
+        // call onERC1155BatchReceived if the destination is a contract
+        if (_to.isContract()) {
+            require(IERC1155TokenReceiver(_to).onERC1155BatchReceived(msg.sender, _from, _ids, _values, _data) == ERC1155_BATCH_RECEIVED, "Receiver contract did not accept the transfer.");
+        }
+    }
+   
+ 
+    function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) public {
+
+        require(allowances[msg.sender][_spender][_id] == _currentValue);
+        allowances[msg.sender][_spender][_id] = _value;
+
+        emit Approval(msg.sender, _spender, _id, _currentValue, _value);
+    }
+
+   
+    function allowance(address _owner, address _spender, uint256 _id) public view returns (uint256){
+        return allowances[_owner][_spender][_id];
+    }
+/**
+     * @dev Private function to remove a token from this extension's ownership-tracking data structures. Note that
+     * while the token is not assigned a new owner, the _ownedTokensIndex mapping is _not_ updated: this allows for
+     * gas optimizations e.g. when performing a transfer operation (avoiding double writes).
+     * This has O(1) time complexity, but alters the order of the _ownedTokens array.
+     * @param from address representing the previous owner of the given token ID
+     * @param tokenId uint256 ID of the token to be removed from the tokens list of the given address
+     */
+    function _removeTokenFromOwnerEnumeration(address from, uint256 tokenId) private {
+        // To prevent a gap in from's tokens array, we store the last token in the index of the token to delete, and
+        // then delete the last slot (swap and pop).
+
+        uint256 lastTokenIndex = _ownedTokens[from].length.sub(1);
+        uint256 tokenIndex = _ownedTokensIndex[from][tokenId];
+
+        // When the token to delete is the last token, the swap operation is unnecessary
+        if (tokenIndex != lastTokenIndex) {
+            uint256 lastTokenId = _ownedTokens[from][lastTokenIndex];
+
+            _ownedTokens[from][tokenIndex] = lastTokenId; // Move the last token to the slot of the to-delete token
+            _ownedTokensIndex[from][lastTokenId] = tokenIndex; // Update the moved token's index
+        }
+
+        // This also deletes the contents at the last position of the array
+        _ownedTokens[from].length--;
+
+        // Note that _ownedTokensIndex[tokenId] hasn't been cleared: it still points to the old slot (now occcupied by
+        // lasTokenId, or just over the end of the array if the token was the last one).
+    }
+
+
+  function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256) {
+        require(index < _ownedTokens[owner].length);
+        return _ownedTokens[owner][index];
+    }
+  function getAllOwnedTokens(address owner) public view returns (uint256[] memory ){
+         return _ownedTokens[owner];
+     }
+
+function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
+        _ownedTokensIndex[to][tokenId] = _ownedTokens[to].length;
+        _ownedTokens[to].push(tokenId);
+    }
+  /**
+     * @dev Internal function to burn all of a specific token
+     * Reverts if the token does not exist
+     
+     * @param _owner owner of the token to burn
+     * @param _tokenId uint256 ID of the token being burned
+     */
+    function _burnall(address _owner, uint256 _tokenId) internal {
+      
+
+        _removeTokenFromOwnerEnumeration(_owner, _tokenId);
+        // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
+        _ownedTokensIndex[_owner][_tokenId] = 0;
+        balances[_tokenId][_owner]=0;
+        if(isNFT[_tokenId]==true){
+            MutableTokenData[_tokenId]="";
+            TokenData[_tokenId]="";
+        }
+       
+    }
+     /**
+     * @dev Internal function to burn a specific token amont
+     * Reverts if the token does not exist
+     * Deprecated, use _burn(uint256) instead
+     * @param _owner owner of the token to burn
+     * @param _tokenId uint256 ID of the token being burned
+     */
+     function _burnAmount(address _owner, uint256 _tokenId,uint _amount) internal {
+       
+        if(balanceOf(_owner,_tokenId).sub(_amount)==0){
+        _removeTokenFromOwnerEnumeration(_owner, _tokenId);
+        _ownedTokensIndex[_owner][_tokenId]=0;
+        }
+        // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
+        balances[_tokenId][_owner]= balances[_tokenId][_owner].sub(_amount);
+
+       
+    }
+
+    function burn(uint256 _tokenId) public{
+        require(balanceOf(msg.sender,_tokenId)>=1);
+        _burnall(msg.sender, _tokenId);
     }
 }
