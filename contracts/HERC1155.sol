@@ -4,15 +4,15 @@ import './ERC/ERC1155Mintable.sol';
 import './ERC/SafeMath.sol';
 import './openzeppelin/Ownable.sol';
 import './openzeppelin/MinterRole.sol';
+import './ProxyReceiver/ProxyReceiver.sol';
 
 
-
-contract HERC1155 is ERC1155Mintable, MinterRole{
+contract HERC1155 is ERC1155Mintable, MinterRole,Ownable{
 
    using SafeMath for uint256;
   // mapping(uint=>string) private MutableTokenData;
    //mapping(uint=>string) private TokenData;
-   
+   mapping(uint=>bool) whitelistedToken;
    
 
 

@@ -68,7 +68,7 @@ contract ProxyReceiver is ProxyBaseStorage, IERC1538 {
     /// @param _functionSignatures A list of function signatures listed one after the other
     /// @param _commitMessage A short description of the change and why it is made
     ///        This message is passed to the CommitMessage event.
-    function updateContract(address _delegate, string calldata _functionSignatures, string calldata _commitMessage) external {
+    function updateContract(address _delegate, string memory _functionSignatures, string memory _commitMessage) internal {
 
         // ***
         // NEEDS SECURITY ADDING HERE, SUGGEST MULTI-ADDRESS APPROVAL SYSTEM OR EQUIVALENT.

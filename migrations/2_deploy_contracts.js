@@ -24,7 +24,7 @@ function deployContracts(deployer, network) {
       //await deployer.deploy(TOS,DT.address)
       
       let E=await deployer.deploy(ERC1155)
-      await deployer.deploy(NFT,1,E.address)
+      await deployer.deploy(NFT,E.address,1)
    
 })
 }

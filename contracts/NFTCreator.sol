@@ -19,15 +19,16 @@ HERC1155 Token;
 
 uint primaryToken;
 
-uint totalNFTs;
+uint public totalNFTs;
 
-mapping(uint=>uint) attachedTokens;
+mapping(uint=>uint) public attachedTokens;
 
-mapping(uint=>NFT) NFTTypes;
+mapping(uint=>NFT) public NFTTypes;
 
 constructor(address _token,uint _primaryToken) public{
     primaryToken=_primaryToken;
     Token =HERC1155(_token);
+    shouldReject=false;
 }
 
 function AddNewNFT(string memory _name,string memory _symbol,uint _mintlimit,uint _attachedtokens) public onlyOwner() {
@@ -65,7 +66,10 @@ function withdrawAttached(uint nft) public{
         shouldReject = _value;
   }
 
-
+function getNFTData(uint id) public returns(string memory,string memory,uint ,uint){
+      NFT memory tokentype=NFTTypes[id];
+      return(tokentype.name,tokentype.symbol,tokentype.mintlimit,tokentype.attachedTokens);
+}
 
 
 }
