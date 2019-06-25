@@ -52,8 +52,11 @@ contract("tests the NFT creator",(accounts)=>{
         let POData=""
         
         NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+        NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+        NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+        NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
         console.log(await  tokenContract.getAllOwnedTokens(user2))
-        
+        console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
     })
     it('allows users to mint different NFT Types',async()=>{
        
@@ -65,12 +68,12 @@ contract("tests the NFT creator",(accounts)=>{
 
     it('allows users to withdraw attached tokens for different NFT Types',async()=>{
         await tokenContract.approve(
-            NFTContract.address,3,0,
+            NFTContract.address,6,0,
             1, {
               from: user3,
             },
           )
-        await NFTContract.withdrawAttached(3,{from:user3})
+        await NFTContract.withdrawAttached(6,{from:user3})
     })
 
 
