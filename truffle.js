@@ -2,9 +2,9 @@ require('dotenv').config();
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
 
-const ropstenUrl = `https://eth-ropsten.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
-const rinkebyUrl = `https://eth-rinkeby.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
-const mainNetUrl=`https://eth-mainnet.alchemyapi.io/jsonrpc/${process.env.INFURA}`;
+const ropstenUrl = `https://ropsten.infura.io/v3/${process.env.ROPSTENINFURA}`;
+const mainNetUrl = `https://mainnet.infura.io/v3/${process.env.MAINNETINFURA}`;
+const rinkebyUrl=`https://rinkeby.infura.io/v3/${process.env.RINKEBYINFURA}`;
 module.exports = {
   networks: {
     development: {
@@ -16,7 +16,7 @@ module.exports = {
     },
     ropsten: {
       provider() {
-        return new HDWalletProvider(process.env.MNEMONIC, ropstenUrl, 0);
+        return new HDWalletProvider(process.env.PRIVATEKEY, ropstenUrl, 0);
       },
       network_id: 3,
       gasPrice: Web3.utils.toWei('25', 'gwei'),
@@ -24,7 +24,7 @@ module.exports = {
     },
     rinkeby: {
       provider() {
-        return new HDWalletProvider(process.env.MNEMONIC, rinkebyUrl, 0);
+        return new HDWalletProvider(process.env.PRIVATEKEY, rinkebyUrl, 0);
       },
       network_id: 4,
       gasPrice: 2000000000,

@@ -73,7 +73,8 @@ function getNFTData(uint id) public view returns(string memory,string memory,uin
       NFT memory tokentype=NFTTypes[id];
       return(tokentype.name,tokentype.symbol,tokentype.mintlimit,tokentype.attachedTokens);
 }
-function getAllTokensofType(uint _type) public view returns(uint[20] memory List ){
+
+function getAllTokensofType(uint _type) public view returns(uint[100] memory List ){
     uint[] memory tokens = Token.getAllOwnedTokens(msg.sender);
     uint j=0;
     for(uint i=0;i<tokens.length;i++){

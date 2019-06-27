@@ -18,22 +18,33 @@ contract ERC1155 is IERC1155, ERC165
     
     // id => (owner => balance)
     mapping (uint256 => mapping(address => uint256)) internal balances;
+
     mapping(address => mapping(address => mapping(uint256 => uint256))) allowances;
     // owner => (operator => approved)
     mapping (address => mapping(address => bool)) internal operatorApproval;
-    mapping(uint=>string) internal MutableTokenData;
-    mapping(uint=>string) internal TokenData;
-    mapping(uint256=>string) public Symbol;
-    mapping(uint256=>string) public Name;
-    mapping(uint256=>bool) internal isNFT;
-    event Approval(address indexed _owner, address indexed _spender, uint256 indexed _id, uint256 _oldValue, uint256 _value);
-   
 
-     // Mapping from owner to list of owned token IDs
+    mapping(uint=>string) internal MutableTokenData;
+
+    mapping(uint=>string) internal TokenData
+    ;
+    mapping(uint256=>string) public Symbol;
+
+    mapping(uint256=>string) public Name;
+
+
+   // mapping(uint256=>bool) internal isNFT;
+
+    mapping(uint256=>uint256) public totalSupply;
+        // Mapping from owner to list of owned token IDs
     mapping(address => uint256[]) private _ownedTokens;
 
     // Mapping from token ID to index of the owner tokens list
     mapping(address=>mapping(uint256 => uint256)) private _ownedTokensIndex;
+
+    event Approval(address indexed _owner, address indexed _spender, uint256 indexed _id, uint256 _oldValue, uint256 _value);
+   
+
+ 
 /////////////////////////////////////////// ERC165 //////////////////////////////////////////////
 
     /*
@@ -288,8 +299,10 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         _removeTokenFromOwnerEnumeration(_owner, _tokenId);
         // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
         _ownedTokensIndex[_owner][_tokenId] = 0;
+        uint amountBurned=balances[_tokenId][_owner];
         balances[_tokenId][_owner]=0;
-        if(isNFT[_tokenId]==true){
+        totalSupply[_tokenId]=totalSupply[_tokenId].sub(amountBurned);
+        if(totalSupply[_tokenId]==0){
             MutableTokenData[_tokenId]="";
             TokenData[_tokenId]="";
         }
@@ -310,7 +323,11 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         }
         // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
         balances[_tokenId][_owner]= balances[_tokenId][_owner].sub(_amount);
-
+        totalSupply[_tokenId]=totalSupply[_tokenId].sub(_amount);
+        if(totalSupply[_tokenId]==0){
+            MutableTokenData[_tokenId]="";
+            TokenData[_tokenId]="";
+        }
        
     }
 

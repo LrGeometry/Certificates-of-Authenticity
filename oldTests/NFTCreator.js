@@ -25,8 +25,8 @@ contract("tests the NFT creator",(accounts)=>{
         
         let list=await  tokenContract.getAllOwnedTokens(user1)
         assert.equal(list[0].toNumber(),1,"token 1 is in list")
-       
-        await tokenContract.addMinter(NFTContract.address,{from:user1})
+        //console.log(tokenContract)
+       await tokenContract.addMinter(NFTContract.address,{from:user1})
        
         await tokenContract.safeTransferFrom(user1,user3,1,1000,'0x0',{from:user1})
         
@@ -56,7 +56,7 @@ contract("tests the NFT creator",(accounts)=>{
         NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
         NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
         console.log(await  tokenContract.getAllOwnedTokens(user2))
-        console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
+       // console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
     })
     it('allows users to mint different NFT Types',async()=>{
        
@@ -73,6 +73,7 @@ contract("tests the NFT creator",(accounts)=>{
               from: user3,
             },
           )
+          console.log((await tokenContract.totalSupply(6)).toNumber());
         await NFTContract.withdrawAttached(6,{from:user3})
     })
 

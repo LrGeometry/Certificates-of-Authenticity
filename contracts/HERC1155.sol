@@ -7,7 +7,7 @@ import './openzeppelin/MinterRole.sol';
 import './ProxyReceiver/ProxyReceiver.sol';
 
 
-contract HERC1155 is ERC1155Mintable, MinterRole,Ownable{
+contract HERC1155 is MinterRole,ERC1155Mintable, Ownable{
 
    using SafeMath for uint256;
   // mapping(uint=>string) private MutableTokenData;
@@ -25,6 +25,7 @@ contract HERC1155 is ERC1155Mintable, MinterRole,Ownable{
         _id = ++nonce;
         creators[_id] = msg.sender;
         balances[_id][msg.sender] = _initialSupply;
+        totalSupply[_id]=_initialSupply;
         Name[_id]=name;
         Symbol[_id]=symbol;
         _addTokenToOwnerEnumeration(msg.sender, _id); 
@@ -34,18 +35,18 @@ contract HERC1155 is ERC1155Mintable, MinterRole,Ownable{
         if (bytes(_uri).length > 0)
             emit URI(_uri, _id);
     }
+    
     function createfor(uint256 _initialSupply, string memory _uri,string memory _mutabledata,address to,string memory name,string memory symbol,uint mintlimit) onlyMinter() public returns(uint256 _id) {
 
         _id = ++nonce;
         creators[_id] = to;
         balances[_id][to] = _initialSupply;
+        totalSupply[_id]=_initialSupply;
         Name[_id]=name;
         Symbol[_id]=symbol;
         MintableTokens[_id]=mintlimit;
         TokenData[_id]=_uri;
-        if(mintlimit==0){
-            isNFT[_id]=true;
-        }
+        
         _addTokenToOwnerEnumeration(to, _id); 
         // Transfer event with mint semantic
         emit TransferSingle(to, address(0x0), to, _id, _initialSupply);
@@ -62,9 +63,9 @@ contract HERC1155 is ERC1155Mintable, MinterRole,Ownable{
         return  TokenData[_id];
     }
     function editMutableData(uint _id,string memory s) public {
-        require(balanceOf(msg.sender, _id)==1);
+        require((balanceOf(msg.sender, _id)==1)&&(totalSupply[_id]==1));
         MutableTokenData[_id]=s;   
     }
-
+  
 
 }       

@@ -40,8 +40,13 @@ contract ERC1155Mintable is ERC1155 {
     // Batch mint tokens. Assign directly to _to[].
     function mint(uint256 _id, address[] memory _to, uint256[] memory _quantities) public creatorOnly(_id) {
         uint total=sumAsm(_quantities);
+
+        totalSupply[_id]+=total;
+
         require(total<=MintableTokens[_id]);
+
         MintableTokens[_id]=MintableTokens[_id].sub(total);
+        
         for (uint256 i = 0; i < _to.length; ++i) {
 
             address to = _to[i];
