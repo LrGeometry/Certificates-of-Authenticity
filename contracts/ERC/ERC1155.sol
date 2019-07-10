@@ -27,14 +27,14 @@ contract ERC1155 is IERC1155, ERC165
 
     mapping(uint=>string) internal TokenData
     ;
-    mapping(uint256=>string) public Symbol;
+    mapping(uint256=>string) public _Symbol;
 
-    mapping(uint256=>string) public Name;
+    mapping(uint256=>string) public _Name;
 
+    mapping(uint256=>address) internal NFTOwner;
+    mapping(uint256=>bool) internal isNFT;
 
-   // mapping(uint256=>bool) internal isNFT;
-
-    mapping(uint256=>uint256) public totalSupply;
+    mapping(uint256=>uint256) public TotalSupply;
         // Mapping from owner to list of owned token IDs
     mapping(address => uint256[]) private _ownedTokens;
 
@@ -85,7 +85,9 @@ contract ERC1155 is IERC1155, ERC165
         // or if _id is not valid (balance will be 0)
         balances[_id][_from] = balances[_id][_from].sub(_value);
         balances[_id][_to]   = _value.add(balances[_id][_to]);
-
+        if(isNFT[_id]==true){
+            NFTOwner[_id]=_to;
+        }
         emit TransferSingle(msg.sender, _from, _to, _id, _value);
 
         if (_to.isContract()) {
@@ -126,26 +128,7 @@ contract ERC1155 is IERC1155, ERC165
 
         return balances_;
     }
-      /**
-        @notice Enable or disable approval for a third party ("operator") to manage all of the caller's tokens.
-        @dev MUST emit the ApprovalForAll event on success.
-        @param _operator  Address to add to the set of authorized operators
-        @param _approved  True if the operator is approved, false to revoke approval
-    */
-  function setApprovalForAll(address _operator, bool _approved) public {
-        operatorApproval[msg.sender][_operator] = _approved;
-        emit ApprovalForAll(msg.sender, _operator, _approved);
-    }
-
-    /**
-        @notice Queries the approval status of an operator for a given owner.
-        @param _owner     The owner of the Tokens
-        @param _operator  Address of authorized operator
-        @return           True if the operator is approved, false if not
-    */
-    function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
-        return operatorApproval[_owner][_operator];
-    }
+  
 
     function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) public  {
             if (msg.sender != _from) {
@@ -218,6 +201,9 @@ contract ERC1155 is IERC1155, ERC165
                 }
             balances[id][_from] = balances[id][_from].sub(value);
             balances[id][_to]   = value.add(balances[id][_to]);
+            if(isNFT[id]==true){
+                NFTOwner[id]=_to;
+            }
         }
 
         // MUST emit event
@@ -231,15 +217,14 @@ contract ERC1155 is IERC1155, ERC165
     }
    
  
-    function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) public {
+   /* function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) public {
 
         require(allowances[msg.sender][_spender][_id] == _currentValue);
         allowances[msg.sender][_spender][_id] = _value;
 
         emit Approval(msg.sender, _spender, _id, _currentValue, _value);
     }
-
-   
+    */
     function allowance(address _owner, address _spender, uint256 _id) public view returns (uint256){
         return allowances[_owner][_spender][_id];
     }
@@ -301,8 +286,8 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         _ownedTokensIndex[_owner][_tokenId] = 0;
         uint amountBurned=balances[_tokenId][_owner];
         balances[_tokenId][_owner]=0;
-        totalSupply[_tokenId]=totalSupply[_tokenId].sub(amountBurned);
-        if(totalSupply[_tokenId]==0){
+        TotalSupply[_tokenId]=TotalSupply[_tokenId].sub(amountBurned);
+        if(TotalSupply[_tokenId]==0){
             MutableTokenData[_tokenId]="";
             TokenData[_tokenId]="";
         }
@@ -323,8 +308,8 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         }
         // Since tokenId will be deleted, we can clear its slot in _ownedTokensIndex to trigger a gas refund
         balances[_tokenId][_owner]= balances[_tokenId][_owner].sub(_amount);
-        totalSupply[_tokenId]=totalSupply[_tokenId].sub(_amount);
-        if(totalSupply[_tokenId]==0){
+        TotalSupply[_tokenId]=TotalSupply[_tokenId].sub(_amount);
+        if(TotalSupply[_tokenId]==0){
             MutableTokenData[_tokenId]="";
             TokenData[_tokenId]="";
         }
@@ -335,4 +320,25 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         require(balanceOf(msg.sender,_tokenId)>=1);
         _burnall(msg.sender, _tokenId);
     }
+        /**
+        @notice Enable or disable approval for a third party ("operator") to manage all of the caller's tokens.
+        @dev MUST emit the ApprovalForAll event on success.
+        @param _operator  Address to add to the set of authorized operators
+        @param _approved  True if the operator is approved, false to revoke approval
+    */
+  function setApprovalForAll(address _operator, bool _approved) public {
+        operatorApproval[msg.sender][_operator] = _approved;
+        emit ApprovalForAll(msg.sender, _operator, _approved);
+    }
+
+    /**
+        @notice Queries the approval status of an operator for a given owner.
+        @param _owner     The owner of the Tokens
+        @param _operator  Address of authorized operator
+        @return           True if the operator is approved, false if not
+    */
+    function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
+        return operatorApproval[_owner][_operator];
+    }
+       
 }

@@ -19,9 +19,9 @@ contract("tests the NFT creator",(accounts)=>{
         let Quantity = 100*10**10;
         let Uri = 'this is the main herc token';
         let Uri2 = 'this is the second herc token';
-       
-        tx = await MetaERC.create(Quantity, Uri,"Herculus","HERC", {from: user1});
-        tx = await MetaERC.create(Quantity, Uri2,"Herculus2","HERC2", {from: user1});
+       //uint256 _initialSupply, string memory _uri,string memory _mutabledata,address to,string memory name,string memory symbol,uint mintlimit
+        //tx = await MetaERC.create(Quantity, Uri,"Herculus","HERC", {from: user1});
+        tx = await MetaERC.createfor(Quantity,Uri, Uri2,user1,"Herculus2","HERC2",0);
         
         let list=await  MetaERC.getAllOwnedTokens(user1)
         assert.equal(list[0].toNumber(),1,"token 1 is in list")

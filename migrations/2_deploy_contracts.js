@@ -3,7 +3,7 @@
 //const DummyToken = artifacts.require('test/DummyToken');
 //const TOS=artifacts.require('TOS.sol')
 
-const ERC1155=artifacts.require('HERC1155.sol')
+const ERC1155=artifacts.require('HERC115520.sol')
 const Meta=artifacts.require('MetaHERC1155.sol')
 const NFT=artifacts.require('NFTCreator');
 
@@ -25,7 +25,7 @@ function deployContracts(deployer, network) {
       
       let E=await deployer.deploy(ERC1155)
       await deployer.deploy(NFT,E.address,1)
-      await deployer.deploy(Meta)
+      //await deployer.deploy(Meta)
       
    
 })

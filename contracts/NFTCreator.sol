@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./HERC1155.sol";
+import "./HERC115520.sol";
 import "./Receiver.sol";
 import "./openzeppelin/Ownable.sol";
 
@@ -23,25 +23,25 @@ uint public totalNFTs;
 
 mapping(uint=>uint) public attachedTokens;
 
-mapping(uint=>NFT) public NFTTypes;
+mapping(uint=>NFT) public NFTTemplates;
 
 mapping(uint=>uint) public tokenType;
 
 constructor(address _token,uint _primaryToken) public{
     primaryToken=_primaryToken;
-    Token =HERC1155(_token);
+    Token =HERC115520(_token);
     shouldReject=false;
 }
 
-function AddNewNFT(string memory _name,string memory _symbol,uint _mintlimit,uint _attachedtokens) public onlyOwner() {
+function AddNFTTemplate(string memory _name,string memory _symbol,uint _mintlimit,uint _attachedtokens) public onlyOwner() {
     totalNFTs++;
-    NFTTypes[totalNFTs]=NFT(_name,_symbol,_mintlimit,_attachedtokens);
+    NFTTemplates[totalNFTs]=NFT(_name,_symbol,_mintlimit,_attachedtokens);
 
 }
 
 function mintNFT(uint _type,string memory data,string memory mutabledata) public{
     require(_type<=totalNFTs);
-    NFT memory tokentype=NFTTypes[_type];
+    NFT memory tokentype=NFTTemplates[_type];
 
     if(tokentype.attachedTokens>0){
      require(
@@ -52,7 +52,8 @@ function mintNFT(uint _type,string memory data,string memory mutabledata) public
        
             Token.safeTransferFrom(msg.sender, address(this),primaryToken,tokentype.attachedTokens,'0x0');
     } 
-     uint ID =Token.createfor(1,data,mutabledata,msg.sender,tokentype.name,tokentype.symbol,tokentype.mintlimit);     
+     uint ID =Token.createfor(1,data,mutabledata,msg.sender,tokentype.name,tokentype.symbol,tokentype.mintlimit);   
+     require(ID>1);  
      attachedTokens[ID]= tokentype.attachedTokens;
      tokenType[ID]=_type;
 }
@@ -70,7 +71,7 @@ function withdrawAttached(uint nft) public{
   }
 
 function getNFTData(uint id) public view returns(string memory,string memory,uint ,uint){
-      NFT memory tokentype=NFTTypes[id];
+      NFT memory tokentype=NFTTemplates[id];
       return(tokentype.name,tokentype.symbol,tokentype.mintlimit,tokentype.attachedTokens);
 }
 

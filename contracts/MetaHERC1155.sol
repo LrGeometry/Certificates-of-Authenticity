@@ -47,7 +47,19 @@ contract MetaHERC1155 is HERC1155{
         emit Approval(signer, _spender, _id, _currentValue, _value);
         //approve(signer,  _spender,  _ids,   _valuea,_data);
    }
-   
+   function metaUpdateData(bytes memory signature,uint _token,string memory _newdata,uint _nonce) public{
+        bytes32 hash = metaUpdateHash(_token ,_newdata,_nonce);
+        address signer = getSigner(hash, signature);
+
+        require(signer != address(0), "Cannot get signer");
+        require(_nonce == nonces[signer], "Nonce is invalid");
+
+        nonces[signer] += 1;
+
+       require((balanceOf(signer, _token)==1)&&(isNFT[_token]==true));
+        MutableTokenData[_token]=_newdata;   
+
+    }
 
     function metaTransferSingleHash(address to, uint256 tokenId, uint256 value, uint256 _nonce) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), "metaTransferSingleFrom", to, tokenId,value ,_nonce));
@@ -58,6 +70,9 @@ contract MetaHERC1155 is HERC1155{
     function metaApproveHash(address _spender, uint256 _id, uint256 _currentValue, uint256 _value,uint _nonce) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), "metaApproveHash",_spender,_id,_currentValue,_value,nonce));
     }
+    function metaUpdateHash(uint _token,string memory _newdata,uint _nonce)  public returns (bytes32){
+    return keccak256(abi.encodePacked(address(this), "metaUpdateHash",_token,_newdata,_nonce));
+}    
     /*
      * @dev Gets the signer of an hash using the signature
      * @param hash The hash to check

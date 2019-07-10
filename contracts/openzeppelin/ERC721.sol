@@ -98,7 +98,7 @@ contract ERC721 is ERC165, IERC721 {
         return _tokenApprovals[tokenId];
     }
 
-    /**
+    /**d
      * @dev Sets or unsets the approval of a given operator
      * An operator is allowed to transfer all tokens of the sender on their behalf
      * @param to operator address to set the approval
