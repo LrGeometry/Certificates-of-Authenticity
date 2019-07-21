@@ -1,23 +1,10 @@
 pragma solidity ^0.5.0;
 import './HERC1155.sol';
 import './openzeppelin/IERC20.sol';
-
-contract HERC115520 is HERC1155,IERC20{
-
-constructor() public {
-        nonce=nonce+1;
-        creators[1] = msg.sender;
-        balances[1][msg.sender] = _TotalSupply;
-        TotalSupply[1]=_TotalSupply;
-        _Name[1]=_name;
-        _Symbol[1]=_symbol;
-        _addTokenToOwnerEnumeration(msg.sender, 1); 
-        // Transfer event with mint semantic
-        emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);
-        HercTokenMinted=true;
-        emit Transfer(address(0), msg.sender,1);
-}
-        /**function transfer(address to, uint256 value) external returns (bool);
+import './ProxyReceiver/ProxyReceiver.sol';
+/**
+    ERC20 Methods that need to implemented for backward compatibility
+    function transfer(address to, uint256 value) external returns (bool);
 
     function approve(address spender, uint256 value) external returns (bool);
 
@@ -32,36 +19,52 @@ constructor() public {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value); */
+contract HERC115520 is HERC1155,IERC20,ProxyReceiver{
 
-  function balanceOf(address owner) public view returns (uint256 balance){
-          
-          return super.balanceOf(owner,1);
+    constructor() public {
+            nonce=nonce+1;                        
+            creators[1] = msg.sender;
+            balances[1][msg.sender] = _TotalSupply;
+            TotalSupply[1]=_TotalSupply;
+            _Name[1]=_name;
+            _Symbol[1]=_symbol;
+            _addTokenToOwnerEnumeration(msg.sender, 1);        
+            emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);            
+            emit Transfer(address(0), msg.sender,1);
+    }
+    
 
-   }
-   function transfer(address to, uint256 value) public returns(bool){
-            super.safeTransferFrom(msg.sender, to,  1, value, "");
-               emit Transfer(msg.sender,   to,value);
-               return true;
-   }
+    function balanceOf(address owner) public view returns (uint256 balance){
+        
+            return super.balanceOf(owner,1);
 
-   function totalSupply() public view returns(uint){
-       return _TotalSupply;
-   }
-  function name() public view returns(string memory){
-       return _name;
-   }
+    }
+
+    function transfer(address to, uint256 value) public returns(bool){
+        super.safeTransferFrom(msg.sender, to,  1, value, "");
+         // emit Transfer(msg.sender,   to,value);
+        return true;
+    }
+
+    function totalSupply() public view returns(uint){
+        return _TotalSupply;
+    }
+    function name() public view returns(string memory){
+        return _name;
+    }
+
     function symbol() public view returns(string memory){
-       return _symbol;
-   }
-      function decimals() public view returns(uint8){
-       return _decimals;
-   }
-    function transferFrom(address from, address to, uint256 value) public returns(bool){
-            super.safeTransferFrom(from, to,  1, value, "");
-               emit Transfer(from,   to,  value);
-               return true;
-            
+        return _symbol;
+    }
 
+    function decimals() public view returns(uint8){
+       return _decimals;
+    }
+
+    function transferFrom(address from, address to, uint256 value) public returns(bool){
+        super.safeTransferFrom(from, to,  1, value, "");
+        emit Transfer(from,   to,  value);
+        return true;
     }
 
  
@@ -70,7 +73,6 @@ constructor() public {
         require(to != address(0), "ERC20: approve to the zero address");
        // require(allowances[msg.sender][to][1]==0);
         allowances[msg.sender][to][1] =value;
-
         emit Approval(msg.sender,to, 1, 0, 1);
         return true;
      }
@@ -79,11 +81,13 @@ constructor() public {
 
         require(allowances[msg.sender][_spender][_id] == _currentValue);
         allowances[msg.sender][_spender][_id] = _value;
-
         emit Approval(msg.sender, _spender, _id, _currentValue, _value);
     }
 
     function allowance(address owner, address spender) external view returns (uint256){
         return super.allowance(owner, spender, 1);
     }
+
+
+  
 }

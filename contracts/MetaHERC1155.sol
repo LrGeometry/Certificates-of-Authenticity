@@ -1,7 +1,8 @@
 pragma solidity ^0.5.0;
-import './HERC1155.sol';
+import './HERC115520.sol';
 /*Copyright (c) 2019-2552 Hercules SEZC Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except in compliance with the License.You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, softwaredistributed under the License is distributed on an "AS IS" BASIS,WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.See the License for the specific language governing permissions andlimitations under the License.*/
-contract MetaHERC1155 is HERC1155{
+contract MetaHERC1155 is HERC115520{
+    
     mapping(address=>uint) public nonces;
 
 
@@ -64,15 +65,18 @@ contract MetaHERC1155 is HERC1155{
     function metaTransferSingleHash(address to, uint256 tokenId, uint256 value, uint256 _nonce) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), "metaTransferSingleFrom", to, tokenId,value ,_nonce));
     }
+
     function metaTransferBatchHash(address to, uint256[] memory tokenIds, uint256[] memory values, uint256 _nonce) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this),"metaTransferSingleFrom", to, tokenIds,values, _nonce));
     }
+
     function metaApproveHash(address _spender, uint256 _id, uint256 _currentValue, uint256 _value,uint _nonce) public view returns (bytes32) {
         return keccak256(abi.encodePacked(address(this), "metaApproveHash",_spender,_id,_currentValue,_value,nonce));
     }
+
     function metaUpdateHash(uint _token,string memory _newdata,uint _nonce)  public returns (bytes32){
-    return keccak256(abi.encodePacked(address(this), "metaUpdateHash",_token,_newdata,_nonce));
-}    
+        return keccak256(abi.encodePacked(address(this), "metaUpdateHash",_token,_newdata,_nonce));
+    }    
     /*
      * @dev Gets the signer of an hash using the signature
      * @param hash The hash to check

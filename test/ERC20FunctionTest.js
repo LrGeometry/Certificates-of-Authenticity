@@ -1,6 +1,6 @@
 const NFT = artifacts.require('NFTCreator');
 const Token= artifacts.require('HERC115520')
-
+const FT=artifacts.require('Futurist')
 
 
 
@@ -12,6 +12,7 @@ contract("tests the NFT creator",(accounts)=>{
         user4 = accounts[3];
         NFTContract = await NFT.deployed();
         tokenContract= await Token.deployed()
+        FTcontract=await FT.deployed();
         
     });
     
@@ -24,8 +25,12 @@ contract("tests the NFT creator",(accounts)=>{
         console.log(await tokenContract.balanceOf(user1))
        await tokenContract.addMinter(NFTContract.address,{from:user1})
        
-        await tokenContract.safeTransferFrom(user1,user3,1,1000,'0x0',{from:user1})
-        await tokenContract.transfer(user3,1000,{from:user1})
+      
+       let tx2= await tokenContract.transfer(user3,1000,{from:user1})
+       let tx1 =await tokenContract.safeTransferFrom(user1,user3,1,1000,"0x",{from:user1})
+       
+       console.log(tx1.receipt.gasUsed)
+       console.log(tx2.receipt.gasUsed)
         let userBalance=(await tokenContract.balanceOf(user3)).toNumber()
         assert.equal(userBalance,2000,"tokens transferred properly")
         })  
@@ -34,7 +39,10 @@ contract("tests the NFT creator",(accounts)=>{
        await tokenContract.approve(user4,1000,{from:user3})
        await tokenContract.transferFrom(user3,user2,1000,{from:user4})
     })
-    
+    it('can add new function to the PROXY',async()=>{
+     let tx= await  tokenContract.updateContract(FT.address,'FuturistPoints(uint)addPoints(uint,uint)','adding the futurist contract to test')
+     console.log(tx.receipt.logs)
+    })
 
 
 

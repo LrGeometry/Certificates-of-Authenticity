@@ -1,6 +1,6 @@
-const Token = artifacts.require('HERC1155');
+const Token = artifacts.require('HERC115520');
 const Receiver= artifacts.require('./ERC/ERC1155MockReceiver')
-const expectThrow = require('../test/helpers/expectThrow');
+const expectThrow = require('./helpers/expectThrow');
 
 
 const BigNumber = require('bignumber.js');
@@ -80,10 +80,13 @@ async function testSafeTransferFrom(operator, from, to, id, quantity, data) {
 
     let postBalanceFrom = new BigNumber(await mainContract.balanceOf(from, id));
     let postBalanceTo   = new BigNumber(await mainContract.balanceOf(to, id));
+    console.log(preBalanceFrom.minus(quantity))
+    console.log('big numbers*************************************************************************************')
+    console.log(postBalanceFrom)
 
     if (from !== to){
-        assert.strictEqual(preBalanceFrom.sub(quantity).toNumber(), postBalanceFrom.toNumber());
-        assert.strictEqual(preBalanceTo.add(quantity).toNumber(), postBalanceTo.toNumber());
+        assert.strictEqual(preBalanceFrom.minus(quantity).toNumber(), postBalanceFrom.toNumber());
+        assert.strictEqual(preBalanceTo.toNumber()+quantity, postBalanceTo.toNumber());
     } else {
         // When from === to, just make sure there is no change in balance.
         assert.strictEqual(preBalanceFrom.toNumber(), postBalanceFrom.toNumber());
@@ -143,8 +146,8 @@ async function testSafeBatchTransferFrom(operator, from, to, ids, quantities, da
     console.log(preBalanceTo)
     for (let i = 0; i < ids.length; ++i) {
         if (from !== to){
-            assert.strictEqual(preBalanceFrom[i].sub(quantities[i]).toNumber(), postBalanceFrom[i].toNumber());
-            assert.strictEqual(preBalanceTo[i].add(quantities[i]).toNumber(), postBalanceTo[i].toNumber());
+            assert.strictEqual(preBalanceFrom[i].toNumber()-quantities[i], postBalanceFrom[i].toNumber());
+            assert.strictEqual(preBalanceTo[i].toNumber()+quantities[i], postBalanceTo[i].toNumber());
         } else {
             assert.strictEqual(preBalanceFrom[i].toNumber(), postBalanceFrom[i].toNumber());
         }
@@ -254,8 +257,8 @@ contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
         await testSafeTransferFrom(user1, user1, user1, hammerId, 1, web3.utils.fromAscii(''));
     });
 
-    it('safeTransferFrom zero value', async () => {
-        await testSafeTransferFrom(user3, user3, user1, hammerId, 0, web3.utils.fromAscii(''));
+    it('safeTransferFrom zero value should fail', async () => {
+        await expectThrow(testSafeTransferFrom(user3, user3, user1, hammerId, 0, web3.utils.fromAscii('')));
     });
 
     it('safeTransferFrom from approved operator', async () => {
@@ -324,8 +327,8 @@ contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
         await testSafeBatchTransferFrom(user1, user1, user1, idSet, quantities, web3.utils.fromAscii(''));
     });
 
-    it('safeBatchTransferFrom zero quantity with zero balance', async () => {
-        await testSafeBatchTransferFrom(user3, user3, user1, idSet, [0,0,0], web3.utils.fromAscii(''));
+    it('safeBatchTransferFrom zero quantity with zero balance should fail', async () => {
+       await expectThrow( mainContract.safeBatchTransferFrom(user3, user1, idSet, [0,0,0], web3.utils.fromAscii('')));
     });
 
     // ToDo test event setApprovalForAll
@@ -389,7 +392,7 @@ contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
         assert(await mainContract.supportsInterface(uriInterface) === true);
     });
 
-    it('setURI only callable by minter (implementation specific)', async () => {
+   /* it('setURI only callable by minter (implementation specific)', async () => {
         let newHammerUri = 'https://metadata.enjincoin.io/new_hammer.json';
         await expectThrow(mainContract.setURI(newHammerUri, hammerId, {from: user2}));
     });
@@ -399,7 +402,7 @@ contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
         tx = await mainContract.setURI(newHammerUri, hammerId, {from: user1});
         verifyURI(tx, newHammerUri, hammerId);
     });
-
+    
     it('mint (implementation specific) - callable only from initial minter ()', async () => {
         await expectThrow(mainContract.mint(hammerId, [user3], [1], {from: user2}));
     });
@@ -409,4 +412,5 @@ contract('ERC1155Mintable - tests all core 1155 functionality.', (accounts) => {
 
     it('mint (implementation specific) - emits a valid Transfer* event - not tested', async () => {
     });
+    **/
 });

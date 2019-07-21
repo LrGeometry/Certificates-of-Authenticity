@@ -27,7 +27,7 @@ mapping(uint=>NFT) public NFTTemplates;
 
 mapping(uint=>uint) public tokenType;
 
-constructor(address _token,uint _primaryToken) public{
+constructor(address payable _token,uint _primaryToken) public{
     primaryToken=_primaryToken;
     Token =HERC115520(_token);
     shouldReject=false;

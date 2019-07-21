@@ -44,26 +44,26 @@ contract("tests the NFT creator",(accounts)=>{
           from: user3,
         },
       ));
-
+    it('allows users to mint different NFT Types',async()=>{
+       
+       let BLData="data and stuff"
+       await NFTContract.mintNFT(2,BLData,"some mutable data",{from:user3})
+       console.log(await  tokenContract.getAllOwnedTokens(user3)+"owned")
+       console.log(await tokenContract.nonce())
+    })
   
     it('allows users to mint different NFT Types',async()=>{
       let POData="this is PODATA"
       
      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     await   NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     await   NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     ( await  tokenContract.getAllOwnedTokens(user2)+"all owned tokens")
+     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+     //await  tokenContract.getAllOwnedTokens(user2)+"all owned tokens"
      //console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
   
   })
-  it('allows users to mint different NFT Types',async()=>{
-       
-    let BLData=""
-    NFTContract.mintNFT(2,BLData,"some mutable data",{from:user3})
-    console.log(await  tokenContract.getAllOwnedTokens(user3)+"owned")
-    console.log(await tokenContract.nonce())
-})
+
     it('allows users to withdraw attached tokens for different NFT Types',async()=>{
         await tokenContract.approve(
             NFTContract.address,6,0,

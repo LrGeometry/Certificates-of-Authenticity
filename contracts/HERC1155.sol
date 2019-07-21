@@ -4,7 +4,7 @@ import './ERC/ERC1155Mintable.sol';
 import './ERC/SafeMath.sol';
 import './openzeppelin/Ownable.sol';
 import './openzeppelin/MinterRole.sol';
-import './ProxyReceiver/ProxyReceiver.sol';
+//import './ProxyReceiver/ProxyReceiver.sol';
 import './Managable.sol';
 import './openzeppelin/Ownable.sol';
 contract HERC1155 is Ownable,MinterRole,Managable{
@@ -12,8 +12,8 @@ contract HERC1155 is Ownable,MinterRole,Managable{
    using SafeMath for uint256;
   // mapping(uint=>string) private MutableTokenData;
    //mapping(uint=>string) private TokenData;
-   mapping(uint=>bool) whitelistedToken;
-   bool HercTokenMinted;
+  // mapping(uint=>bool) whitelistedToken;
+  // bool HercTokenMinted;
    string _name="Hercules";
    string _symbol="HERC";
    uint _TotalSupply=234259085000000000000000000;
@@ -30,14 +30,15 @@ contract HERC1155 is Ownable,MinterRole,Managable{
         emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);
         HercTokenMinted=true;
     } 
-   /**  function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter() public returns(uint256 _id) {
+       */
+     function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter() public returns(uint256 _id) {
 
         _id = ++nonce;
         creators[_id] = msg.sender;
         balances[_id][msg.sender] = _initialSupply;
-        totalSupply[_id]=_initialSupply;
-        Name[_id]=name;
-        Symbol[_id]=symbol;
+        TotalSupply[_id]=_initialSupply;
+        _Name[_id]=name;
+        _Symbol[_id]=symbol;
         _addTokenToOwnerEnumeration(msg.sender, _id); 
         // Transfer event with mint semantic
         emit TransferSingle(msg.sender, address(0x0), msg.sender, _id, _initialSupply);
@@ -45,7 +46,7 @@ contract HERC1155 is Ownable,MinterRole,Managable{
         if (bytes(_uri).length > 0)
             emit URI(_uri, _id);
     }
-    */
+    
     
     function createfor(uint256 _initialSupply, string memory _uri,string memory _mutabledata,address to,string memory name,string memory symbol,uint mintlimit) onlyMinter() public returns(uint256 _id) {
 

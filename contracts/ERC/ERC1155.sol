@@ -32,6 +32,7 @@ contract ERC1155 is IERC1155, ERC165
     mapping(uint256=>string) public _Name;
 
     mapping(uint256=>address) internal NFTOwner;
+
     mapping(uint256=>bool) internal isNFT;
 
     mapping(uint256=>uint256) public TotalSupply;
@@ -77,7 +78,7 @@ contract ERC1155 is IERC1155, ERC165
    
 
      function _safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) internal {
-        require(_value>0,"cannot tranfer 0 toknes");
+        require(_value>0*10**18,"cannot tranfer 0 tokens");
         require(_to != address(0x0), "_to must be non-zero.");
        // require(_from == msg.sender || operatorApproval[_from][msg.sender] == true, "Need operator approval for 3rd party transfers.");
 
@@ -139,8 +140,8 @@ contract ERC1155 is IERC1155, ERC165
             }
             
             
-
-             if(balanceOf(_from,_id).sub(_value)==0){
+            require(balances[_id][_from]>=_value,'inadequate token balance for transfer');
+            if(balanceOf(_from,_id).sub(_value)==0){
                 _removeTokenFromOwnerEnumeration( _from, _id);
               }
             if(balanceOf(_to,_id)==0){
@@ -155,6 +156,7 @@ contract ERC1155 is IERC1155, ERC165
         if (msg.sender != _from) {
             if(operatorApproval[_from][msg.sender] == false){
                 for (uint256 i = 0; i < _ids.length; ++i) {
+                   // require(value > 0*10**18,"cannot transfer 0 tokens");
                     require( allowances[_from][msg.sender][_ids[i]]>=_values[i],"inadequate allowance");
                     allowances[_from][msg.sender][_ids[i]] = allowances[_from][msg.sender][_ids[i]].sub(_values[i]);
                     
@@ -192,12 +194,13 @@ contract ERC1155 is IERC1155, ERC165
             require(value > 0*10**18,"cannot transfer 0 tokens");
             // SafeMath will throw with insuficient funds _from
             // or if _id is not valid (balance will be 0)
+             require(balances[id][_from]>=value,'inadequate token balance for transfer');
 
-             if(balances[id][_from].sub(value)==0){
-                 _removeTokenFromOwnerEnumeration( _from,_ids[i]);
+             if(balances[id][_from].sub(value)==0 ){
+                 _removeTokenFromOwnerEnumeration( _from,id);
                  }
              if(balances[id][_to] ==0){
-                   _addTokenToOwnerEnumeration(_to,_ids[i]); 
+                _addTokenToOwnerEnumeration(_to,id); 
                 }
             balances[id][_from] = balances[id][_from].sub(value);
             balances[id][_to]   = value.add(balances[id][_to]);

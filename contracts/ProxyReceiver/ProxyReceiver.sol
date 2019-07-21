@@ -43,8 +43,11 @@ contract ProxyReceiver is ProxyBaseStorage, IERC1538 {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     function() external payable {
+
         address delegate = delegates[msg.sig];
+
         require(delegate != address(0), "Function does not exist.");
+
         assembly {
             let ptr := mload(0x40)
             calldatacopy(ptr, 0, calldatasize)
@@ -68,7 +71,7 @@ contract ProxyReceiver is ProxyBaseStorage, IERC1538 {
     /// @param _functionSignatures A list of function signatures listed one after the other
     /// @param _commitMessage A short description of the change and why it is made
     ///        This message is passed to the CommitMessage event.
-    function updateContract(address _delegate, string memory _functionSignatures, string memory _commitMessage) internal {
+    function updateContract(address _delegate, string calldata _functionSignatures, string calldata _commitMessage) external {
 
         // ***
         // NEEDS SECURITY ADDING HERE, SUGGEST MULTI-ADDRESS APPROVAL SYSTEM OR EQUIVALENT.
@@ -87,10 +90,13 @@ contract ProxyReceiver is ProxyBaseStorage, IERC1538 {
 
         // creates a bytes version of _functionSignatures
         bytes memory signatures = bytes(_functionSignatures);
+
         // stores the position in memory where _functionSignatures ends.
         uint256 signaturesEnd;
+
         // stores the starting position of a function signature in _functionSignatures
         uint256 start;
+
         assembly {
             pos := add(signatures,32)
             start := pos
@@ -98,17 +104,24 @@ contract ProxyReceiver is ProxyBaseStorage, IERC1538 {
         }
         // the function id of the current function signature
         bytes4 funcId;
+
         // the delegate address that is being replaced or address(0) if removing functions
         address oldDelegate;
+
         // the length of the current function signature in _functionSignatures
         uint256 num;
+
         // the current character in _functionSignatures
         uint256 char;
+
         // the position of the current function signature in the funcSignatures array
         uint256 index;
+
         // the last position in the funcSignatures array
         uint256 lastIndex;
+
         // parse the _functionSignatures string and handle each function
+        
         for (; pos < signaturesEnd; pos++) {
             assembly {char := byte(0,mload(pos))}
             // 0x29 == )
