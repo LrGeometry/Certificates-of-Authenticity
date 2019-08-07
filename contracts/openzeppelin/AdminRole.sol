@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./Roles.sol";
-
+//import "./Ownable.sol";
 contract AdminRole {
     using Roles for Roles.Role;
 
@@ -9,7 +9,7 @@ contract AdminRole {
     event AdminRemoved(address indexed account);
 
     Roles.Role private _Admins;
-
+    
     constructor () internal {
         _addAdmin(msg.sender);
     }

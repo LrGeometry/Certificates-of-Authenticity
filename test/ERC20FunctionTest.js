@@ -1,6 +1,6 @@
 const NFT = artifacts.require('NFTCreator');
 const Token= artifacts.require('HERC115520')
-const FT=artifacts.require('Futurist')
+//const FT=artifacts.require('Futurist')
 
 
 
@@ -12,7 +12,7 @@ contract("tests the NFT creator",(accounts)=>{
         user4 = accounts[3];
         NFTContract = await NFT.deployed();
         tokenContract= await Token.deployed()
-        FTcontract=await FT.deployed();
+       // FTcontract=await FT.deployed();
         
     });
     

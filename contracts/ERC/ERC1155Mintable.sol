@@ -19,7 +19,7 @@ contract ERC1155Mintable is ERC1155 {
     //mapping(uint256=>uint256) mintingLimit;
     mapping(uint256=>uint256) MintableTokens;
     modifier creatorOnly(uint256 _id) {
-        require(creators[_id] == msg.sender);
+        require(creators[_id] == msg.sender,'sender is not the token creator');
         _;
     }
     
@@ -39,11 +39,11 @@ contract ERC1155Mintable is ERC1155 {
    
     // Batch mint tokens. Assign directly to _to[].
     function mint(uint256 _id, address[] memory _to, uint256[] memory _quantities) public creatorOnly(_id) {
-        uint total=sumAsm(_quantities);
+        uint total=Sum(_quantities);
 
         TotalSupply[_id]+=total;
 
-        require(total<=MintableTokens[_id]);
+        require(total<=MintableTokens[_id],'to is larger than mintable tokens');
 
         MintableTokens[_id]=MintableTokens[_id].sub(total);
         
@@ -65,13 +65,10 @@ contract ERC1155Mintable is ERC1155 {
             }
         }
     }
-      function sumAsm(uint[] memory _data) public pure returns (uint sum) {
+      function Sum(uint[] memory _data) public pure returns (uint sum) {
+
         for (uint i = 0; i < _data.length; ++i) {
-            assembly {
-                sum := add(sum, mload(add(add(_data, 0x20), mul(i, 0x20))))
-            }
+            sum=sum.add(_data[i]);
         }
-
-
-        
-    }}
+      }       
+}

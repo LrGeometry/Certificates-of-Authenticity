@@ -33,7 +33,7 @@ constructor(address payable _token,uint _primaryToken) public{
     shouldReject=false;
 }
 
-function AddNFTTemplate(string memory _name,string memory _symbol,uint _mintlimit,uint _attachedtokens) public onlyOwner() {
+function CreateTemplate(string memory _name,string memory _symbol,uint _mintlimit,uint _attachedtokens) public onlyOwner() {
     totalNFTs++;
     NFTTemplates[totalNFTs]=NFT(_name,_symbol,_mintlimit,_attachedtokens);
 
@@ -70,21 +70,7 @@ function withdrawAttached(uint nft) public{
         shouldReject = _value;
   }
 
-function getNFTData(uint id) public view returns(string memory,string memory,uint ,uint){
-      NFT memory tokentype=NFTTemplates[id];
-      return(tokentype.name,tokentype.symbol,tokentype.mintlimit,tokentype.attachedTokens);
-}
 
-function getAllTokensofType(uint _type) public view returns(uint[100] memory List ){
-    uint[] memory tokens = Token.getAllOwnedTokens(msg.sender);
-    uint j=0;
-    for(uint i=0;i<tokens.length;i++){
-        if(tokenType[tokens[i]]==_type){
-           
-            List[j]=tokens[i];
-             j+=1;
-        }
-    }
-}
+
 
 }
