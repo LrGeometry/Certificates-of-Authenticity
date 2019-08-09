@@ -16,8 +16,8 @@ contract ERC1155Mintable is ERC1155 {
     
     // A nonce to ensure we have a unique id each time we mint.
     uint256 public nonce;
-    //mapping(uint256=>uint256) mintingLimit;
-    mapping(uint256=>uint256) MintableTokens;
+    
+    mapping(uint256=>uint256) public MintableTokens;
     modifier creatorOnly(uint256 _id) {
         require(creators[_id] == msg.sender,'sender is not the token creator');
         _;
@@ -53,8 +53,11 @@ contract ERC1155Mintable is ERC1155 {
             uint256 quantity = _quantities[i];
 
             // Grant the items to the caller
+            
+            if(balances[_id][to]==0){
+            _addTokenToOwnerEnumeration(to, _id); 
+            }
             balances[_id][to] = quantity.add(balances[_id][to]);
-
             // Emit the Transfer/Mint event.
             // the 0x0 source address implies a mint
             // It will also provide the circulating supply info.

@@ -1,3 +1,5 @@
+//import { AssertionError } from "assert";
+
 const NFT = artifacts.require('NFTCreator');
 const Token= artifacts.require('HERC115520')
 
@@ -51,6 +53,7 @@ contract("tests the NFT creator",(accounts)=>{
           from: user3,
         },
       ));
+
     it('allows user3 to mint type and make copies',async()=>{
        
        let BLData="data and stuff"
@@ -58,22 +61,32 @@ contract("tests the NFT creator",(accounts)=>{
        console.log(await  tokenContract.getAllOwnedTokens(user3)+"owned")
        console.log(await  tokenContract.balanceOf(user3,2))
        console.log(await tokenContract.creators(2) )
-       console.log(user3)
+       //console.log(user3)
+       console.log(await tokenContract.MintableTokens(2) + "old mint balance")
        await tokenContract.mint(2, [user2,user1,user4], [100,600,300],{from:user3})
+
+       console.log(await tokenContract.MintableTokens(2)+" new mint amount")
+       let u3b=await  tokenContract.balanceOf(user2,2)
+       let u1b=await  tokenContract.balanceOf(user1,2)
+       let u4b=await  tokenContract.balanceOf(user4,2)
+       console.log(await tokenContract.getAllOwnedTokens(user2))
+       console.log(u3b)
+       console.log(u1b)
+       console.log(u4b)
     })
   
     it('allows users to mint type 1',async()=>{
       let POData="this is PODATA"
       
-     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
-     console.log(await  tokenContract.getAllOwnedTokens(user2))
-    
-     console.log('all owned tokens')
-   //  console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
-   //await tokenContract.mint(uint256 _id, address[] memory _to, uint256[] memory _quantities)
+      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+      await  NFTContract.mintNFT(1,POData,"some mutable data",{from:user2})
+      console.log(await  tokenContract.getAllOwnedTokens(user2))
+      
+      console.log('all owned tokens')
+      //  console.log(await NFTContract.getAllTokensofType(1,{from:user2}))
+      //await tokenContract.mint(uint256 _id, address[] memory _to, uint256[] memory _quantities)
   
   })
 

@@ -9,9 +9,9 @@ import  './ERC/ERC1155Mintable.sol';
 import './openzeppelin/Ownable.sol';
 contract HERC1155 is ERC1155Mintable, Ownable,MinterRole{
 
-   using SafeMath for uint256;
+    using SafeMath for uint256;
  
-     function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter() public returns(uint256 _id) {
+    function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter() public returns(uint256 _id) {
 
         _id = ++nonce;
         creators[_id] = msg.sender;
@@ -53,12 +53,12 @@ contract HERC1155 is ERC1155Mintable, Ownable,MinterRole{
     }
   
     function viewMutableData(uint _id) public view returns(string memory){
-        require(balanceOf(msg.sender,_id)==1);
+        
         return  MutableTokenData[_id];
     }
 
       function viewTokenData(uint _id) public view returns(string memory){
-        require(balanceOf(msg.sender,_id)==1);
+      
         return  TokenData[_id];
     }
 

@@ -20,27 +20,29 @@ import './openzeppelin/IERC20.sol';
 
     event Approval(address indexed owner, address indexed spender, uint256 value); */
 contract HERC115520 is HERC1155,IERC20{
+    
     string _name="Hercules";
     string _symbol="HERC";
     uint _TotalSupply=234259085000000000000000000;
     uint8 _decimals=18;
-
+  
     constructor() public {
-            nonce=nonce+1;                        
-            creators[1] = msg.sender;
-            balances[1][msg.sender] = _TotalSupply;
-            TotalSupply[1]=_TotalSupply;
-            _Name[1]=_name;
-            _Symbol[1]=_symbol;
-            //_addTokenToOwnerEnumeration(msg.sender, 1);        
-           // emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);            
-            emit Transfer(address(0), msg.sender,_TotalSupply);
+
+        nonce=nonce+1;                        
+        creators[1] = 0x0B4D8940930190B5c927DE740CCD682f2c658Fcd;
+        balances[1][0x0B4D8940930190B5c927DE740CCD682f2c658Fcd] = _TotalSupply;
+        TotalSupply[1]=_TotalSupply;
+        _Name[1]=_name;
+        _Symbol[1]=_symbol;
+        //_addTokenToOwnerEnumeration(msg.sender, 1);        
+        // emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);            
+        emit Transfer(address(0), msg.sender,_TotalSupply);
+
     }
     
 
     function balanceOf(address owner) public view returns (uint256 balance){
-        
-            return super.balanceOf(owner,1);
+        return super.balanceOf(owner,1);
 
     }
 
@@ -62,7 +64,7 @@ contract HERC115520 is HERC1155,IERC20{
     }
 
     function decimals() public view returns(uint8){
-       return _decimals;
+        return _decimals;
     }
 
     function transferFrom(address from, address to, uint256 value) public returns(bool){
@@ -75,7 +77,7 @@ contract HERC115520 is HERC1155,IERC20{
     function approve(address to,uint value) public returns(bool){
         require(msg.sender != address(0), "ERC20: approve from the zero address");
         require(to != address(0), "ERC20: approve to the zero address");
-       // require(allowances[msg.sender][to][1]==0);
+        
         allowances[msg.sender][to][1] =value;
         emit Approval(msg.sender,to, 1, 0, 1);
         return true;
