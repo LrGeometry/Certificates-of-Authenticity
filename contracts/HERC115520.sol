@@ -30,13 +30,14 @@ contract HERC115520 is HERC1155,IERC20{
 
         nonce=nonce+1;                        
         creators[1] = 0x0B4D8940930190B5c927DE740CCD682f2c658Fcd;
-        balances[1][0x0B4D8940930190B5c927DE740CCD682f2c658Fcd] = _TotalSupply;
+       
+        balances[1][msg.sender] = _TotalSupply;
         TotalSupply[1]=_TotalSupply;
         _Name[1]=_name;
         _Symbol[1]=_symbol;
-        //_addTokenToOwnerEnumeration(msg.sender, 1);        
-        // emit TransferSingle(msg.sender, address(0x0), msg.sender, 1 ,_TotalSupply);            
-        emit Transfer(address(0), msg.sender,_TotalSupply);
+       
+        creators[1] = 0x0B4D8940930190B5c927DE740CCD682f2c658Fcd;
+        emit Transfer(address(0),0x0B4D8940930190B5c927DE740CCD682f2c658Fcd,_TotalSupply);
 
     }
     
@@ -46,7 +47,7 @@ contract HERC115520 is HERC1155,IERC20{
 
     }
 
-    function transfer(address to, uint256 value) public returns(bool){
+    function transfer(address to, uint256 value)  whenNotPaused public returns(bool){
         super.safeTransferFrom(msg.sender, to,  1, value, "");
         emit Transfer(msg.sender,   to,value);
         return true;
@@ -67,28 +68,23 @@ contract HERC115520 is HERC1155,IERC20{
         return _decimals;
     }
 
-    function transferFrom(address from, address to, uint256 value) public returns(bool){
+    function transferFrom(address from, address to, uint256 value) whenNotPaused public returns(bool){
         super.safeTransferFrom(from, to,  1, value, "");
         emit Transfer(from,   to,  value);
         return true;
     }
 
  
-    function approve(address to,uint value) public returns(bool){
+    function approve(address to,uint value) whenNotPaused public returns(bool){
         require(msg.sender != address(0), "ERC20: approve from the zero address");
         require(to != address(0), "ERC20: approve to the zero address");
         
         allowances[msg.sender][to][1] =value;
-        emit Approval(msg.sender,to, 1, 0, 1);
+        
+        emit Approval(msg.sender, to, value);
         return true;
      }
-
-   function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) public {
-
-        require(allowances[msg.sender][_spender][_id] == _currentValue);
-        allowances[msg.sender][_spender][_id] = _value;
-        emit Approval(msg.sender, _spender, _id, _currentValue, _value);
-    }
+   
 
     function allowance(address owner, address spender) external view returns (uint256){
         return super.allowance(owner, spender, 1);

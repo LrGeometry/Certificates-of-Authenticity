@@ -47,8 +47,8 @@ contract("tests the NFT creator",(accounts)=>{
     console.log(await NFTContract.NFTTemplates(1))
     //console.log(await NFTContract.NFTTemplates(0))
     })
-    it('Should give NFTcontract the allowance', () =>  tokenContract.approve(
-        NFTContract.address,1000,
+    it('Should give NFTcontract the allowance', () =>  tokenContract.increaseApproval(
+        NFTContract.address,1,0,1000,
          {
           from: user3,
         },
@@ -89,18 +89,34 @@ contract("tests the NFT creator",(accounts)=>{
       //await tokenContract.mint(uint256 _id, address[] memory _to, uint256[] memory _quantities)
   
   })
-
-  /**   it('allows users to withdraw attached tokens for different NFT Types',async()=>{
-        await tokenContract.approve(
-            NFTContract.address,6,0,
-            1, {
+  
+      it('allows users to withdraw attached tokens for different NFT Types',async()=>{
+        await tokenContract.increaseApproval(
+            NFTContract.address,2,0,
+            10, {
               from: user3,
             },
           )
-          console.log(await tokenContract.TotalSupply(6));
-        await NFTContract.withdrawAttached(6,{from:user3})
+          console.log(await tokenContract.balanceOf(user3,2));
+        await NFTContract.withdrawAttached(2,{from:user3})
+        console.log(await tokenContract.allowance(user3,NFTContract.address,2))
+        await tokenContract.decreaseApproval(
+          NFTContract.address,2,9,
+          4, {
+            from: user3,
+          },
+        )
+        console.log(await tokenContract.allowance(user3,NFTContract.address,2))
+        assert.equal(await tokenContract.allowance(user3,NFTContract.address,2),5,"approval decreased to 5")
+        await tokenContract.decreaseApproval(
+          NFTContract.address,2,9,
+          6, {
+            from: user3,
+          },
+        )
+        assert.equal(await tokenContract.allowance(user3,NFTContract.address,2),0,"approval decreased to 5")
     })
-*/
+
 
 
 

@@ -116,7 +116,7 @@ function verifyTransferEvents(tx, ids, from, to, quantities, operator) {
      }
 
     assert(totalIdCount === ids.length, 'Unexpected number of Transfer events found ' + totalIdCount + ' expected ' + ids.length);
-}
+}const expectThrow = require('./helpers/expectThrow');
 
 async function testSafeBatchTransferFrom(operator, from, to, ids, quantities, data) {
 

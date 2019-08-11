@@ -6,13 +6,15 @@ import "./Address.sol";
 import "./IERC1155TokenReceiver.sol";
 import "./IERC1155.sol";
 import "./ERC165.sol";
-
+import './../openzeppelin/Ownable.sol';
 // A sample implementation of core ERC1155 function.
-contract ERC1155 is IERC1155, ERC165
+contract ERC1155 is IERC1155, ERC165,Ownable
 {
     using SafeMath for uint256;
     using Address for address;
-    
+   
+
+    bool private _paused;
     bytes4 constant public ERC1155_RECEIVED       = 0xf23a6e61;
     bytes4 constant public ERC1155_BATCH_RECEIVED = 0xbc197c81;
     
@@ -44,7 +46,8 @@ contract ERC1155 is IERC1155, ERC165
 
     event Approval(address indexed _owner, address indexed _spender, uint256 indexed _id, uint256 _oldValue, uint256 _value);
    
-
+    event Paused(address account);
+    event Unpaused(address account);
  
 /////////////////////////////////////////// ERC165 //////////////////////////////////////////////
 
@@ -134,7 +137,7 @@ contract ERC1155 is IERC1155, ERC165
     }
   
 
-    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data) public  {
+    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data)  whenNotPaused public  {
             if (msg.sender != _from) {
                 if(operatorApproval[_from][msg.sender] == false){
                     require( allowances[_from][msg.sender][_id]>= _value,"inadequate allowance");
@@ -156,7 +159,7 @@ contract ERC1155 is IERC1155, ERC165
         }
 
   
-    function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) public /*payable*/ {
+    function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _values, bytes memory _data) whenNotPaused public /*payable*/ {
        
         if (msg.sender != _from) {
             if(operatorApproval[_from][msg.sender] == false){
@@ -237,9 +240,33 @@ contract ERC1155 is IERC1155, ERC165
         emit Approval(msg.sender, _spender, _id, _currentValue, _value);
     }
     */
-    function allowance(address _owner, address _spender, uint256 _id) public view returns (uint256){
+    function allowance(address _owner, address _spender, uint256 _id)  whenNotPaused public view returns (uint256){
         return allowances[_owner][_spender][_id];
     }
+
+     function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) whenNotPaused public {
+
+        require(allowances[msg.sender][_spender][_id] == _currentValue);
+        allowances[msg.sender][_spender][_id] = _value;
+        emit Approval(msg.sender, _spender, _id, _currentValue, _value);
+    
+    }
+    function increaseApproval(address _spender, uint256 _id, uint256 _currentValue, uint256 amount) whenNotPaused public{
+        require(allowances[msg.sender][_spender][_id] == _currentValue);
+        allowances[msg.sender][_spender][_id] =  allowances[msg.sender][_spender][_id].add(amount);
+       
+        emit Approval(msg.sender, _spender, _id,_currentValue, _currentValue.add(amount)) ;
+    }
+    function decreaseApproval(address _spender, uint256 _id, uint256 _currentValue, uint256 amount) whenNotPaused public{
+        require(allowances[msg.sender][_spender][_id] == _currentValue);
+        if(amount>_currentValue){
+            allowances[msg.sender][_spender][_id] =0;
+        }else{
+            allowances[msg.sender][_spender][_id] =  allowances[msg.sender][_spender][_id].sub(amount);
+        }
+        emit Approval(msg.sender, _spender, _id,_currentValue, _currentValue.sub(amount)) ;
+    }
+
 /**
      * @dev Private function to remove a token from this extension's ownership-tracking data structures. Note that
      * while the token is not assigned a new owner, the _ownedTokensIndex mapping is _not_ updated: this allows for
@@ -328,7 +355,7 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
        
     }
 
-    function burn(uint256 _tokenId) public{
+    function burn(uint256 _tokenId) whenNotPaused public{
         require(balanceOf(msg.sender,_tokenId)>=1);
         _burnall(msg.sender, _tokenId);
     }
@@ -338,7 +365,7 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
         @param _operator  Address to add to the set of authorized operators
         @param _approved  True if the operator is approved, false to revoke approval
     */
-  function setApprovalForAll(address _operator, bool _approved) public {
+  function setApprovalForAll(address _operator, bool _approved) whenNotPaused public {
         operatorApproval[msg.sender][_operator] = _approved;
         emit ApprovalForAll(msg.sender, _operator, _approved);
     }
@@ -351,6 +378,42 @@ function _addTokenToOwnerEnumeration(address to, uint256 tokenId) internal {
     */
     function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
         return operatorApproval[_owner][_operator];
+    }
+
+    function paused() public view returns (bool) {
+        return _paused;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     */
+    modifier whenNotPaused() {
+        require(!_paused,"the contract is paused");
+        _;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     */
+    modifier whenPaused() {
+        require(_paused,"the contract is paused");
+        _;
+    }
+
+    /**
+     * @dev called by the owner to pause, triggers stopped state
+     */
+    function pause() public onlyOwner whenNotPaused {
+        _paused = true;
+        emit Paused(msg.sender);
+    }
+
+    /**
+     * @dev called by the owner to unpause, returns to normal state
+     */
+    function unpause() public onlyOwner whenPaused {
+        _paused = false;
+        emit Unpaused(msg.sender);
     }
        
 }

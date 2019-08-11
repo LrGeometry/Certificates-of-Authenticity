@@ -60,7 +60,7 @@ function mintNFT(uint _type,string memory data,string memory mutabledata) public
      tokenType[ID]=_type;
 }
 
-function withdrawlAttached(uint nft) public{
+function withdrawAttached(uint nft) public{
     require(TokenContract.balanceOf(msg.sender,nft)==1);
 
      TokenContract.safeTransferFrom(msg.sender,address(this),nft,1,'0x0');

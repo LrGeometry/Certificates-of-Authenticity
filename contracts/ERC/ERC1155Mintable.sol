@@ -38,7 +38,7 @@ contract ERC1155Mintable is ERC1155 {
     // Creates a new token type and assings _initialSupply to minter
    
     // Batch mint tokens. Assign directly to _to[].
-    function mint(uint256 _id, address[] memory _to, uint256[] memory _quantities) public creatorOnly(_id) {
+    function mint(uint256 _id, address[] memory _to, uint256[] memory _quantities)   public  whenNotPaused creatorOnly(_id) {
         uint total=Sum(_quantities);
 
         TotalSupply[_id]+=total;

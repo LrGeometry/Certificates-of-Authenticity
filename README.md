@@ -41,7 +41,7 @@ mapping(uint256=>bool) internal isNFT; Returns True if a token id  has a total s
 
 mapping(uint256=>uint256) public TotalSupply; Total number of Tokens of a given ID
 
-mapping(uint256=>uint256) MintableTokens; Remaining tokens that can be minted of a particular ID
+mapping(uint256=>uint256) public MintableTokens; Remaining tokens that can be minted of a particular ID
 
 mapping (uint256 => address) public creators; Initial Minter of a token. Has the ability to mint an extra  number of tokens specified in the initial token creation.
 

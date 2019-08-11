@@ -2,16 +2,16 @@
 pragma solidity ^0.5.0;
 import './ERC/ERC1155Mintable.sol';
 import './ERC/SafeMath.sol';
-import './openzeppelin/Ownable.sol';
+
 import './openzeppelin/MinterRole.sol';
 import  './ERC/ERC1155Mintable.sol';
 
 import './openzeppelin/Ownable.sol';
-contract HERC1155 is ERC1155Mintable, Ownable,MinterRole{
+contract HERC1155 is ERC1155Mintable,MinterRole{
 
     using SafeMath for uint256;
  
-    function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter() public returns(uint256 _id) {
+    function create(uint256 _initialSupply, string memory _uri,string memory name,string memory symbol) onlyMinter()  whenNotPaused public returns(uint256 _id) {
 
         _id = ++nonce;
         creators[_id] = msg.sender;
@@ -28,7 +28,7 @@ contract HERC1155 is ERC1155Mintable, Ownable,MinterRole{
     }
     
     
-    function createfor(uint256 _initialSupply, string memory _uri,string memory _mutabledata,address to,string memory name,string memory symbol,uint mintlimit) onlyMinter() public returns(uint256 _id) {
+    function createfor(uint256 _initialSupply, string memory _uri,string memory _mutabledata,address to,string memory name,string memory symbol,uint mintlimit) onlyMinter() whenNotPaused public returns(uint256 _id) {
 
         _id = ++nonce;
         creators[_id] = to;
@@ -62,7 +62,7 @@ contract HERC1155 is ERC1155Mintable, Ownable,MinterRole{
         return  TokenData[_id];
     }
 
-    function editMutableData(uint _id,string memory s) public {
+    function editMutableData(uint _id,string memory s)  whenNotPaused public {
         require((balanceOf(msg.sender, _id)==1)&&(isNFT[_id]==true));
         MutableTokenData[_id]=s;   
     }

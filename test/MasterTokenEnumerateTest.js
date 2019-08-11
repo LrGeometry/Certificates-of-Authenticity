@@ -93,7 +93,28 @@ contract("testing enumeration and approval",(accounts)=>{
         //safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes memory _data)
         let list =await  mainContract.getAllOwnedTokens(user2)
         list=convertToNumbers(list)
-        await  mainContract.safeBatchTransferFrom(user2,user3,[2,3,4],[5,200,500],"0x00001",{from:user2})
+        await mainContract.approve(
+            user3,2,0,5, {
+              from: user2,
+            },
+          )
+          await mainContract.approve(
+            user3,3,0,200, {
+              from: user2,
+            },
+          )
+          await mainContract.approve(
+            user3,4,0,500, {
+              from: user2,
+            },
+          )
+        assert.equal(await  mainContract.allowance(user2,user3, 2),5,'allowance is 5') 
+       assert.equal(await  mainContract.allowance(user2,user3, 3),200,'allowance is 200') 
+       assert.equal(await  mainContract.allowance(user2,user3, 4),500,'allowance is 500') 
+        await  mainContract.safeBatchTransferFrom(user2,user3,[2,3,4],[5,200,500],"0x00001",{from:user3})
+       assert.equal(await  mainContract.allowance(user2,user3, 2),0,'allowance is 0') 
+       assert.equal(await  mainContract.allowance(user2,user3, 3),0,'allowance is 0') 
+       assert.equal(await  mainContract.allowance(user2,user3, 4),0,'allowance is 0') 
         let updatedlist =await  mainContract.getAllOwnedTokens(user2)
         updatedlist=convertToNumbers(updatedlist)
         let list2 =await  mainContract.getAllOwnedTokens(user3)
